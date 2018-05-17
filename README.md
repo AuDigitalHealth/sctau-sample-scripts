@@ -1,11 +1,11 @@
-##### *NOTE: It is not recommended that the terminology services be accessed through SQL. The following methods are suggested as an alternative:*
-##### *FHIR*: https://www.healthterminologies.gov.au/specs/v2/conformant-server-apps/fhir-api
-##### *Syndication API*: https://www.healthterminologies.gov.au/specs/v2/conformant-server-apps/syndication-api 
+*NOTE: It is not recommended that the terminology services be accessed through SQL. The following methods are suggested as an alternative:*
+* *FHIR*: https://www.healthterminologies.gov.au/specs/v2/conformant-server-apps/fhir-api
+* *Syndication API*: https://www.healthterminologies.gov.au/specs/v2/conformant-server-apps/syndication-api 
 
 # SNOMED CT-AU Australian Terminology Sample Scripts
 The purpose of these scripts, which are designed to align to the RF2 release structure of SNOMED CT-AU, is to explain and illustrate the release format of SNOMED CT-AU for those wishing to learn and understand its details. Section 9 of the [SNOMED CT-AU Australian Technical Implementation Guide](https://www.healthterminologies.gov.au/docs/DH_2697_2018_SNOMEDCT-AU_AustralianTechnicalImplementationGuide_v2.3.pdf) describes these scripts and the release format in detail.
 
-These scripts *are NOT* recommended as a method of implementing SNOMED CT-AU, a terminology server and/or a bespoke data structure for the particular requirements should be used instead. Detail knowledge of the release format described by these scripts and the implementation guide are required to build, but *not* when using an appropriate terminology server, which will abstract these details away and typically provide much more relevant search functionality and algorithms.
+These scripts ***are NOT*** recommended as a method of implementing SNOMED CT-AU, a terminology server and/or a bespoke data structure for the particular requirements should be used instead. Detail knowledge of the release format described by these scripts and the implementation guide are required to build, but *not* when using an appropriate terminology server, which will abstract these details away and typically provide much more relevant search functionality and algorithms.
 
 The National Clinical Terminology Service provides an HL7 FHIR terminology service endpoint containing up to date terminologies for Australia, the [National Terminology Server](https://www.healthterminologies.gov.au/tools?content=nts). The NCTS also makes available the terminology server software available at this endpoint free for use in Australian health care which can synchronise in content from the NCTS and be augmented with additional FHIR terminology resources as required, [more details on this refer to the NCTS website](https://www.healthterminologies.gov.au/tools?content=onto).
 
