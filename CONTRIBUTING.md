@@ -20,7 +20,7 @@ replace it with a detailed description of the problem you are trying to solve.
 
 ## Creating a pull request
 
-New pull requests within the Hotspot repository are pre-populated with a
+New pull requests within the SNOMED CT-AU Australian Terminology Sample Scripts repository are pre-populated with a
 checklist that describes the Definition of Done that we assess all new changes
 against. It is ok to submit a pull request that has not yet addressed all of
 these items, but be aware that the change will not be merged until it meets the
