@@ -179,3 +179,90 @@ CREATE INDEX v3_total_ingredient_quantity_sizeunitterm_idx ON v3_total_ingredien
 CREATE INDEX v3_total_ingredient_quantity_totalquantity_idx ON v3_total_ingredient_quantity(totalquantity);
 CREATE INDEX v3_total_ingredient_quantity_totalquantityunitid_idx ON v3_total_ingredient_quantity(totalquantityunitid);
 CREATE INDEX v3_total_ingredient_quantity_totalquantityunitterm_idx ON v3_total_ingredient_quantity(totalquantityunitterm(100));
+
+-- CREATE table for v3_AMT_products
+-- This table lists the seven AMT products with the IDs, preferred terms and ARTGID
+DROP TABLE IF EXISTS v3_AMT_products;
+CREATE TABLE v3_AMT_products ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AS
+
+SELECT 
+ctpp_tpp.sourceid CTPP_ID, 
+get_PT(ctpp_tpp.sourceid) COLLATE utf8_unicode_ci CTPP_PT, 
+    IF(artgid.schemeValue is null, '', artgid.schemeValue) ARTG_ID,
+    ctpp_tpp.destinationid TPP_ID, 
+    get_PT(ctpp_tpp.destinationid) COLLATE utf8_unicode_ci TPP_PT,
+    has_tpuu.destinationid TPUU_ID,
+    get_PT(has_tpuu.destinationid) COLLATE utf8_unicode_ci TPUU_PT,
+    has_tp.destinationid TPP_TP_ID,
+    get_PT(has_tp.destinationid) COLLATE utf8_unicode_ci TPP_TP_PT,
+    tpuu_tp.destinationid TPUU_TP_ID,
+    get_PT(tpuu_tp.destinationid) COLLATE utf8_unicode_ci TPUU_TP_PT,
+    tpp_mpp.destinationid MPP_ID, 
+    get_PT(tpp_mpp.destinationid) COLLATE utf8_unicode_ci MPP_PT,
+    tpuu_mpuu.destinationid MPUU_ID,
+    get_PT(tpuu_mpuu.destinationid) COLLATE utf8_unicode_ci MPUU_PT,
+    mpuu_mp.destinationid MP_ID,
+    get_PT(mpuu_mp.destinationid)COLLATE utf8_unicode_ci MP_PT
+    
+FROM transitive_closure ctpp_tpp
+
+JOIN transitive_closure ctpp_type
+ON ctpp_tpp.sourceid = ctpp_type.sourceid
+AND ctpp_type.destinationid = 30537011000036101 -- CTPP concept
+
+JOIN transitive_closure tpp_mpp 
+ON tpp_mpp.sourceid = ctpp_tpp.destinationid
+
+JOIN relationships_snapshot has_tpuu 
+ON ctpp_tpp.sourceid = has_tpuu.sourceid
+AND has_tpuu.typeid = 30409011000036107 -- has TPUU
+AND has_tpuu.active = 1
+
+JOIN relationships_snapshot has_tp
+ON ctpp_tpp.sourceid = has_tp.sourceid 
+AND has_tp.typeid = 700000101000036108 -- has TP
+AND has_tp.active = 1
+
+JOIN transitive_closure tpuu_mpuu
+ON tpuu_mpuu.sourceid = has_tpuu.destinationid
+
+JOIN transitive_closure tpuu_tp
+ON tpuu_tp.sourceid = has_tpuu.destinationid
+
+JOIN transitive_closure mpuu_mp
+ON mpuu_mp.sourceid = tpuu_mpuu.destinationid
+
+LEFT OUTER JOIN irefset_snapshot artgid
+ON artgid.refsetid = 11000168105 -- ARTG Id reference set
+AND artgid.referencedComponentId = ctpp_tpp.sourceid
+AND artgid.active = 1
+
+WHERE EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360041000036105 AND ctpp_tpp.destinationid = referencedComponentId) -- TPP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a 
+                JOIN refset_snapshot ON refsetid = 929360041000036105 AND sourceid = referencedComponentId
+                JOIN transitive_closure b on a.sourceid = b.destinationid 
+                WHERE ctpp_tpp.destinationid = a.destinationid AND ctpp_tpp.sourceid = b.sourceid)
+                
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360081000036101 AND tpp_mpp.destinationid = referencedComponentId) -- MPP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360081000036101 AND sourceid = referencedComponentId 
+                JOIN transitive_closure b ON a.sourceid = b.destinationid 
+                WHERE tpp_mpp.destinationid = a.destinationid and tpp_mpp.sourceid = b.sourceid)
+                
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360071000036103 AND tpuu_mpuu.destinationid = referencedComponentId) -- MPUU refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360071000036103 AND sourceid = referencedComponentId 
+                JOIN transitive_closure b on a.sourceid = b.destinationid 
+                WHERE tpuu_mpuu.destinationid = a.destinationid AND tpuu_mpuu.sourceid = b.sourceid)
+                
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360021000036102 AND tpuu_tp.destinationid = referencedComponentId) -- TP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360021000036102 and sourceid = referencedComponentId 
+                JOIN transitive_closure b on a.sourceid = b.destinationid 
+                WHERE tpuu_tp.destinationid = a.destinationid AND tpuu_tp.sourceid = b.sourceid)
+                
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360061000036106 and mpuu_mp.destinationid = referencedComponentId) -- MP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360061000036106 and sourceid = referencedComponentId 
+                JOIN transitive_closure b ON a.sourceid = b.destinationid 
+                WHERE mpuu_mp.destinationid = a.destinationid AND mpuu_mp.sourceid = b.sourceid);
