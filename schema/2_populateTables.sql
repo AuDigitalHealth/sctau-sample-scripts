@@ -9,7 +9,7 @@ USE `sctau`;
 -- RF2_CONCEPTS_SNAPSHOT
 TRUNCATE TABLE concepts_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_AU1000036_20170831.txt' INTO TABLE concepts_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Terminology/sct2_Concept_Snapshot_AU1000036_20190630.txt' INTO TABLE concepts_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, definitionstatusid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -17,7 +17,7 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- RF2_DESCRIPTIONS_SNAPSHOT
 TRUNCATE TABLE descriptions_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en-AU_AU1000036_20170831.txt' INTO TABLE descriptions_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Terminology/sct2_Description_Snapshot-en-AU_AU1000036_20190630.txt' INTO TABLE descriptions_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, conceptid, languagecode, typeid, term, casesignificanceid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -25,7 +25,7 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- RF2_RELATIONSHIPS_SNAPSHOT
 TRUNCATE TABLE relationships_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_AU1000036_20170831.txt' INTO TABLE relationships_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Terminology/sct2_Relationship_Snapshot_AU1000036_20190630.txt' INTO TABLE relationships_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, sourceid, destinationid, relationshipgroup, typeid, characteristictypeid, modifierid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -33,7 +33,7 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- RF2_LANGUAGE_REFSET_SNAPSHOT
 TRUNCATE TABLE language_refset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en-AU_AU1000036_20170831.txt' INTO TABLE language_refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Language/der2_cRefset_LanguageSnapshot-en-AU_AU1000036_20190630.txt' INTO TABLE language_refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid, acceptabilityid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -44,55 +44,55 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
 TRUNCATE TABLE refset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_<REFSETNAME>Snapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_<REFSETNAME>Snapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_AdverseReactionTypeSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_AdverseReactionTypeSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_ClinicalFindingFoundationSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_ClinicalFindingFoundationSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_ClinicalFindingGrouperExclusionSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_ClinicalFindingGrouperExclusionSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_ContaineredTradeProductPackSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_ContaineredTradeProductPackSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MedicinalProductSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MedicinalProductSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MedicinalProductPackSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MedicinalProductPackSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MedicinalProductUnitOfUseSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MedicinalProductUnitOfUseSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MusculoskeletalFindingSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_MusculoskeletalFindingSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_Schedule8MedicationsSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_Schedule8MedicationsSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_TradeProductSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_TradeProductSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_TradeProductPackSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_TradeProductPackSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_TradeProductUnitOfUseSnapshot_AU1000036_20170831.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_Refset_TradeProductUnitOfUseSnapshot_AU1000036_20190630.txt' INTO TABLE refset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -100,7 +100,7 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- Import historical association reference sets
 TRUNCATE TABLE crefset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_AU1000036_20170831.txt' INTO TABLE crefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_cRefset_AssociationReferenceSnapshot_AU1000036_20190630.txt' INTO TABLE crefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid, targetComponentid) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -108,7 +108,7 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- Import extended association schema refset. Currently only one exists - Route and form extended association
 TRUNCATE TABLE ccrefset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccRefset_DoseRouteAndFormExtendedAssociationSnapshot_AU1000036_20170831.txt' INTO TABLE ccrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccRefset_DoseRouteAndFormExtendedAssociationSnapshot_AU1000036_20190630.txt' INTO TABLE ccrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid,value1,value2) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -120,15 +120,15 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 --
 TRUNCATE TABLE ccsrefset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccsRefset_StrengthSnapshot_AU1000036_20170831.txt' INTO TABLE ccsrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccsRefset_StrengthSnapshot_AU1000036_20190630.txt' INTO TABLE ccsrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid,unitid,operatorid,value) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccsRefset_UnitOfUseQuantitySnapshot_AU1000036_20170831.txt' INTO TABLE ccsrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccsRefset_UnitOfUseQuantitySnapshot_AU1000036_20190630.txt' INTO TABLE ccsrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid,unitid,operatorid,value) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccsRefset_UnitOfUseSizeSnapshot_AU1000036_20170831.txt' INTO TABLE ccsrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_ccsRefset_UnitOfUseSizeSnapshot_AU1000036_20190630.txt' INTO TABLE ccsrefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid,unitid,operatorid,value) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -136,7 +136,7 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- Import the 700000121000036103 Subpack quantity reference set
 TRUNCATE TABLE ccirefset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_cciRefset_SubpackQuantitySnapshot_AU1000036_20170831.txt' INTO TABLE ccirefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_cciRefset_SubpackQuantitySnapshot_AU1000036_20190630.txt' INTO TABLE ccirefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid,unitid,operatorid,value) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 
@@ -144,6 +144,6 @@ set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
 -- Import the 11000168105 ARTG Id reference set
 TRUNCATE TABLE irefset_snapshot;
 
-LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Map/der2_iRefset_ARTGIdSnapshot_AU1000036_20170831.txt' INTO TABLE irefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Map/der2_iRefset_ARTGIdSnapshot_AU1000036_20190630.txt' INTO TABLE irefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid, schemeValue) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
