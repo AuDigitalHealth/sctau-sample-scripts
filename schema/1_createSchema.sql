@@ -106,6 +106,27 @@ CREATE TABLE IF NOT EXISTS `refset_snapshot` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
+-- Table structure for table `crefset_snapshot`
+-- Required for history tracking of components
+--
+
+DROP TABLE IF EXISTS `crefset_snapshot`;
+CREATE TABLE IF NOT EXISTS `crefset_snapshot` (
+  `id` varchar(36) NOT NULL,
+  `effectivetime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `active` int(1) NOT NULL,
+  `moduleid` bigint(18) NOT NULL,
+  `refsetid` bigint(18) NOT NULL,
+  `referencedcomponentid` bigint(18) NOT NULL,
+  `targetComponentid` bigint(18) NOT NULL,
+  PRIMARY KEY  (`id`,`effectivetime`),
+  CONSTRAINT FOREIGN KEY (moduleid) REFERENCES full_concepts(id) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (refsetid) REFERENCES full_concepts(id) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (referencedcomponentid) REFERENCES full_concepts(id) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (targetComponentid) REFERENCES full_concepts(id) ON DELETE CASCADE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
 -- Table structure for table `ccrefset_snapshot`
 -- Required for use of Dose route and form extended association reference set
 --
