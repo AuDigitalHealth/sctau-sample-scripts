@@ -136,4 +136,42 @@ AND d.active=1
 AND adrs.active=1
 AND d.term like '% obstetric%';
 
+-- 8. Finding AMT product concepts that have been inactivated and has an association with another concept
+
+SELECT effectiveTime,
+refsetid,
+get_PT(refsetid),
+referencedcomponentid,
+get_PT(referencedcomponentid),
+targetComponentid,
+get_PT(targetComponentid)
+ 
+FROM crefset_snapshot
+ 
+WHERE targetComponentid IN (
+    SELECT referencedcomponentid
+    FROM refset_snapshot
+    WHERE refsetid IN (929360061000036106,929360021000036102,929360081000036101,929360041000036105,929360051000036108,929360071000036103,929360031000036100)
+    AND active = 1
+    )
+AND active = 1
+
+-- 9. Finding AMT product concepts that have been inactivated and has NO association with another concept
+
+SELECT
+refset_snapshot.referencedcomponentid AS original_concept_ID,
+get_PT(refset_snapshot.referencedcomponentid) AS original_concept_PT,
+crefset_snapshot.targetComponentid AS replacement_concept_ID,
+get_PT(crefset_snapshot.targetComponentid) AS replacement_concept_term
+
+FROM refset_snapshot
+
+LEFT OUTER JOIN crefset_snapshot
+ON refset_snapshot.referencedcomponentid = crefset_snapshot.referencedcomponentid
+AND crefset_snapshot.active = 1
+
+WHERE refset_snapshot.refsetid IN (929360061000036106,929360021000036102,929360081000036101,929360041000036105,929360051000036108,929360071000036103,929360031000036100)
+AND refset_snapshot.active = 0
+AND crefset_snapshot.targetComponentid IS null
+
 
