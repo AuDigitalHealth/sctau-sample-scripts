@@ -1,4 +1,4 @@
--- Search for all MPPs and TPPs based with an intended active ingredient a word containing 'amoxy'
+-- Search for all MPPs and TPPs based with an intended active ingredient a word containing 'amox'
 select
     v3_mpp_to_tpp.mppid,
     v3_mpp_to_tpp.mppterm,
@@ -270,7 +270,10 @@ AND MPUUdesc.typeid = 900000000000013009 -- synonym
 JOIN language_refset_snapshot MPUUadrs
 ON MPUUdesc.id = MPUUadrs.referencedcomponentid
 AND MPUUadrs.acceptabilityid = 900000000000548007 -- Preferred
-AND MPUUadrs.active = 1;
+AND MPUUadrs.active = 1
+
+WHERE TPUU.refsetid = 1050951000168102 -- S8 reference set
+AND TPUU.active = 1;
 
 
 -- Deriving TPUUs and MPUUs from CTPPs in the reference set
@@ -334,5 +337,8 @@ AND MPUUdesc.typeid = 900000000000013009 -- synonym
 JOIN language_refset_snapshot MPUUadrs
 ON MPUUdesc.id = MPUUadrs.referencedcomponentid
 AND MPUUadrs.acceptabilityid = 900000000000548007 -- preferred
-AND MPUUadrs.active = 1;
+AND MPUUadrs.active = 1
+
+WHERE CTPP.refsetid = 1050951000168102 -- S8 reference set
+AND CTPP.active = 1;
 
