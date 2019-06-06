@@ -139,3 +139,11 @@ TRUNCATE TABLE ccirefset_snapshot;
 LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Content/der2_cciRefset_SubpackQuantitySnapshot_AU1000036_20170831.txt' INTO TABLE ccirefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
 (id, @effectivetime, active, moduleid, refsetid, referencedcomponentid,unitid,operatorid,value) 
 set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
+
+-- RF2_IREFSET_SNAPSHOT
+-- Import the 11000168105 ARTG Id reference set
+TRUNCATE TABLE irefset_snapshot;
+
+LOAD DATA LOCAL INFILE 'release-files/RF2Release/Snapshot/Refset/Map/der2_iRefset_ARTGIdSnapshot_AU1000036_20170831.txt' INTO TABLE irefset_snapshot CHARACTER SET 'utf8' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+(id, @effectivetime, active, moduleid, refsetid, referencedcomponentid, schemeValue) 
+set effectivetime = str_to_date(@effectivetime, '%Y%m%d');
