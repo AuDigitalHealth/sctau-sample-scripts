@@ -190,3 +190,22 @@ CREATE TABLE IF NOT EXISTS ccirefset_snapshot (
 --  PRIMARY KEY  (id,effective_time)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+--
+-- Table structure for table `full_ARTGId_irefset`
+-- Stores the 11000168105 ARTG Id reference set
+--
+
+DROP TABLE IF EXISTS `irefset_snapshot`;
+CREATE TABLE IF NOT EXISTS `irefset_snapshot` (
+  `id` varchar(36) NOT NULL,
+  `effectivetime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `active` int(1) NOT NULL,
+  `moduleid` bigint(18) NOT NULL,
+  `refsetid` bigint(18) NOT NULL,
+  `referencedcomponentid` bigint(18) NOT NULL,
+  `schemeValue` varchar(10) NOT NULL,
+  PRIMARY KEY  (`id`,`effectivetime`),
+  CONSTRAINT FOREIGN KEY (moduleid) REFERENCES full_concepts(id) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (refsetid) REFERENCES full_concepts(id) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (referencedcomponentid) REFERENCES full_concepts(id) ON DELETE CASCADE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
