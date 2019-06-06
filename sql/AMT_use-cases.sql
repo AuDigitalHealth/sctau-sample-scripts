@@ -342,3 +342,57 @@ AND MPUUadrs.active = 1
 WHERE CTPP.refsetid = 1050951000168102 -- S8 reference set
 AND CTPP.active = 1;
 
+-- Finding the proximal MP for an MPUU
+
+SELECT DISTINCT
+MPUUisMP.sourceid AS MPUU_id,
+get_PT(MPUUisMP.sourceid) AS MPUU_term,
+MPUUisMP.destinationid AS MP_id,
+get_PT(MPUUisMP.destinationid) AS MP_term
+
+FROM transitive_closure MPUUisMP
+
+INNER JOIN refset_snapshot MPUU
+ON MPUUisMP.sourceid = MPUU.referencedcomponentid
+AND MPUU.refsetid = 929360071000036103 -- MPUU refset
+AND MPUU.active = 1
+
+INNER JOIN refset_snapshot MP
+ON MPUUisMP.destinationid = MP.referencedcomponentid
+AND MP.refsetid = 929360061000036106 -- MP refset
+AND MP.active = 1
+
+AND NOT EXISTS( -- don't give me MPUUs that don't have the same IAIs as the parent MP
+    SELECT 1 FROM relationships_snapshot MPUUhasIAI
+    WHERE MPUUhasIAI.sourceid = MPUUisMP.sourceid
+    AND MPUUhasIAI.typeid = 700000081000036101 -- has intended active ingredient
+    AND MPUUhasIAI.active = 1
+    AND NOT EXISTS (
+        SELECT 1 FROM relationships_snapshot MPhasIAI
+        WHERE MPhasIAI.sourceid = MPUUisMP.destinationid
+        AND MPhasIAI.destinationid = MPUUhasIAI.destinationid
+        AND MPhasIAI.typeid = 700000081000036101 -- has intended active ingredient
+        AND MPhasIAI.active = 1)
+	)
+
+AND NOT EXISTS ( -- don't give me MPs that don't have the same IAIs as the child MPUU
+    SELECT 1 FROM relationships_snapshot MPhasIAI
+    WHERE MPhasIAI.sourceid = MPUUisMP.destinationid
+    AND MPhasIAI.typeid = 700000081000036101 -- has intended active ingredient
+    AND MPhasIAI.active = 1
+    AND NOT EXISTS (
+        SELECT 1 FROM relationships_snapshot MPUUhasIAI
+        WHERE MPUUhasIAI.sourceid = MPUUisMP.sourceid
+        AND MPUUhasIAI.destinationid = MPhasIAI.destinationid
+        AND MPUUhasIAI.typeid = 700000081000036101 -- has intended active ingredient
+        AND MPUUhasIAI.active = 1)
+	)
+
+WHERE MPUUisMP.sourceid IN
+    (685621000168108, -- buprenorphine 8 mg sublingual tablet
+     22109011000036100, -- buprenorphine 8 mg + naloxone 2 mg sublingual tablet
+     33677011000036108, -- naloxone hydrochloride 2 mg/5 mL injection, syringe
+     22077011000036108 -- buprenorphine 10 microgram/hour patch
+     )
+
+ORDER BY MP_term;
