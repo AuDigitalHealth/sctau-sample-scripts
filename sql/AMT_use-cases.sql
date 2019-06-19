@@ -158,7 +158,7 @@ ARTG.schemeValue
 
 FROM refset_snapshot CTPP -- refset that contains CTPP and TPUU for reportable drugs
 
-JOIN artgid_refset_snapshot ARTG -- refset that maps CTPP with ARTGID
+JOIN irefset_snapshot ARTG -- refset that maps CTPP with ARTGID
 ON CTPP.referencedcomponentid = ARTG.referencedcomponentid
 AND CTPP.referencedcomponentid IN (
     SELECT referencedcomponentid
