@@ -266,3 +266,23 @@ AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
                 JOIN refset_snapshot ON refsetid = 929360061000036106 and sourceid = referencedComponentId 
                 JOIN transitive_closure b ON a.sourceid = b.destinationid 
                 WHERE mpuu_mp.destinationid = a.destinationid AND mpuu_mp.sourceid = b.sourceid);
+
+-- Create Indexes for v3_AMT_products table
+CREATE INDEX v3_AMT_products_CTPP_ID_idx ON v3_AMT_products(CTPP_ID);
+CREATE INDEX v3_AMT_products_CTPP_PT_idx ON v3_AMT_products(CTPP_PT(100));
+CREATE INDEX v3_AMT_products_ARTG_ID_idx ON v3_AMT_products(ARTG_ID);
+CREATE INDEX v3_AMT_products_TPP_ID_idx ON v3_AMT_products(TPP_ID);
+CREATE INDEX v3_AMT_products_TPP_PT_idx ON v3_AMT_products(TPP_PT(100));
+CREATE INDEX v3_AMT_products_TPUU_ID_idx ON v3_AMT_products(TPUU_ID);
+CREATE INDEX v3_AMT_products_TPUU_PT_idx ON v3_AMT_products(TPUU_PT(100));
+CREATE INDEX v3_AMT_products_TPP_TP_ID_idx ON v3_AMT_products(TPP_TP_ID);
+CREATE INDEX v3_AMT_products_TPP_TP_PT_idx ON v3_AMT_products(TPP_TP_PT(100));
+CREATE INDEX v3_AMT_products_TPUU_TP_ID_idx ON v3_AMT_products(TPUU_TP_ID);
+CREATE INDEX v3_AMT_products_TPUU_TP_PT_idx ON v3_AMT_products(TPUU_TP_PT(100));
+CREATE INDEX v3_AMT_products_MPP_ID_idx ON v3_AMT_products(MPP_ID);
+CREATE INDEX v3_AMT_products_MPP_PT_idx ON v3_AMT_products(MPP_PT(100));
+CREATE INDEX v3_AMT_products_MPUU_ID_idx ON v3_AMT_products(MPUU_ID);
+CREATE INDEX v3_AMT_products_MPUU_PT_idx ON v3_AMT_products(MPUU_PT(100));
+CREATE INDEX v3_AMT_products_MP_ID_idx ON v3_AMT_products(MP_ID);
+CREATE INDEX v3_AMT_products_MP_PT_idx ON v3_AMT_products(MP_PT(100));
+
