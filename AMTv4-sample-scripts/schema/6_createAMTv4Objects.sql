@@ -22,26 +22,71 @@ CREATE INDEX v4_MPPhasMPUU_mpuuid_idx ON v4_MPPhasMPUU(mpuuid);
 CREATE INDEX v4_MPPhasMPUU_mpuuterm_idx ON v4_MPPhasMPUU(mpuuterm(100));
 
 
--- Create TPP has TPUU table
+-- Create TPP contains TPUU table
 -- This table is reused in the other derived objects tables.
-DROP TABLE IF EXISTS v4_TPPhasTPUU;
-CREATE TABLE v4_TPPhasTPUU AS
+-- Three types of queries are required for the different patterns of products
+DROP TABLE IF EXISTS v4_TPPcontainsTPUU;
+CREATE TABLE v4_TPPcontainsTPUU AS
+
+-- First level of packs is simple "TPP contains TPUU" type relationships.
 SELECT 
     TPPhasTPUU.sourceId as tppid,
     get_PT(TPPhasTPUU.sourceId) as tppterm,
     TPPhasTPUU.destinationId as tpuuid,
     get_PT(TPPhasTPUU.destinationId) as tpuuterm
-
 FROM relationships_snapshot TPPhasTPUU  
     WHERE TPPhasTPUU.active = 1
 	 AND TPPhasTPUU.typeid IN (774160008,999000081000168101) -- Contains clinical drug / Contains device
     AND TPPhasTPUU.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360041000036105 AND active = 1) -- TPP refset
-    AND TPPhasTPUU.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100 AND active = 1); -- TPUU refset
+    AND TPPhasTPUU.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100 AND active = 1) -- TPUU refset
+    
+UNION    
+-- Second level of packs - Get the TPUU for a combinationPack
+-- In AMTv4 the "containsTPUU" type relationship is not restated on combination packs.
+SELECT 
+    TPPcontainsPack.sourceId as tppid,
+    get_PT(TPPcontainsPack.sourceId) as tppterm,
+    PackhasTPUU.destinationId as tpuuid,
+    get_PT(PackhasTPUU.destinationId) as tpuuterm
+FROM relationships_snapshot TPPcontainsPack
+JOIN relationships_snapshot PackhasTPUU
+ON TPPcontainsPack.destinationid = PackhasTPUU.sourceid
+    WHERE TPPcontainsPack.active = 1
+    AND PackhasTPUU.active = 1
+	 AND TPPcontainsPack.typeid = 999000011000168107 -- Contains packaged clinical drug
+    AND TPPcontainsPack.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360041000036105 AND active = 1) -- TPP refset
+    AND PackhasTPUU.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100 AND active = 1) -- TPUU refset   
+	 AND PackhasTPUU.typeid IN (774160008,999000081000168101) -- Contains clinical drug / Contains device
 
-CREATE INDEX v4_TPPhasTPUU_tppid_idx ON v4_TPPhasTPUU(tppid);
-CREATE INDEX v4_TPPhasTPUU_tppterm_idx ON v4_TPPhasTPUU(tppterm(100));
-CREATE INDEX v4_TPPhasTPUU_tpuuid_idx ON v4_TPPhasTPUU(tpuuid);
-CREATE INDEX v4_TPPhasTPUU_tpuuterm_idx ON v4_TPPhasTPUU(tpuuterm(100));
+UNION
+-- Third level of packs
+-- These are combination packs, where one of the components is it's self a multicomponent pack.
+-- These are exceptional products with atypical modelling. 
+-- Pegatron Combination Therapy with Redipen products & Viekira Pak-RBV products
+SELECT 
+    TPPcontainsCTPP.sourceId as tppid,
+    get_PT(TPPcontainsCTPP.sourceId) as tppterm,
+    CTPPcontainsTPUU.destinationId as tpuuid,
+    get_PT(CTPPcontainsTPUU.destinationId) as tpuuterm
+FROM relationships_snapshot TPPcontainsCTPP
+JOIN relationships_snapshot CTPPcontainsCTPP
+ON TPPcontainsCTPP.destinationid = CTPPcontainsCTPP.sourceid
+	AND TPPcontainsCTPP.active = 1
+	AND TPPcontainsCTPP.typeid = 999000011000168107 -- Contains packaged clinical drug
+	AND CTPPcontainsCTPP.active = 1
+	AND CTPPcontainsCTPP.typeid = 999000011000168107 -- Contains packaged clinical drug
+JOIN relationships_snapshot CTPPcontainsTPUU
+ON CTPPcontainsCTPP.destinationid = CTPPcontainsTPUU.sourceid
+	AND CTPPcontainsTPUU.active = 1
+	 AND CTPPcontainsTPUU.typeid IN (774160008,999000081000168101) -- Contains clinical drug / Contains device
+	AND CTPPcontainsTPUU.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100 AND active = 1); -- TPUU refset 
+
+
+CREATE INDEX v4_TPPcontainsTPUU_tppid_idx ON v4_TPPcontainsTPUU(tppid);
+CREATE INDEX v4_TPPcontainsTPUU_tppterm_idx ON v4_TPPcontainsTPUU(tppterm(100));
+CREATE INDEX v4_TPPcontainsTPUU_tpuuid_idx ON v4_TPPcontainsTPUU(tpuuid);
+CREATE INDEX v4_TPPcontainsTPUU_tpuuterm_idx ON v4_TPPcontainsTPUU(tpuuterm(100));
+
 
 
 -- CREATE Table for v4_ingredient_strength
@@ -231,7 +276,14 @@ CREATE TABLE v4_MPUU_ISA_MP AS
 SELECT distinct MPUU_MP.sourceId as mpuuid,
     get_PT(MPUU_MP.sourceId) as mpuuterm,
     MPUU_MP.destinationId as mpid,
-    get_PT(MPUU_MP.destinationId) as mpterm   
+    get_PT(MPUU_MP.destinationId) as mpterm,
+    
+    --  Subquery TO sort the identified MPs by MP_PT length
+	--  as other MPs with less ingredients/or modifications may be present too.
+    ROW_NUMBER() OVER (
+            PARTITION BY mpuuid
+            ORDER BY LENGTH(mpterm) DESC
+        ) AS rn   
 FROM transitive_closure MPUU_MP
 WHERE MPUU_MP.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360071000036103 AND active = 1) -- MPUU refset
 AND MPUU_MP.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360061000036106 AND active = 1) -- MP refset
@@ -246,6 +298,13 @@ AND MPUU_MP.destinationId NOT IN (SELECT MP_MP.destinationId as ancestorMPid
 												AND MP_MP.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360061000036106 AND active = 1) -- MP refset												
 												AND NESTED.sourceid = MPUU_MP.sourceid
 												);
+
+-- Remove the less specific ancestor MPs based on the MP_PT length sort
+-- And drop the sort column.
+DELETE FROM v4_MPUU_ISA_MP
+WHERE rn != 1;
+ALTER TABLE v4_MPUU_ISA_MP
+DROP COLUMN rn;
 										
 CREATE INDEX v4_MPUU_ISA_MP_mpuuid_idx ON v4_MPUU_ISA_MP(mpuuid);
 CREATE INDEX v4_MPUU_ISA_MP_mpuuterm_idx ON v4_MPUU_ISA_MP(mpuuterm(100));
@@ -254,105 +313,107 @@ CREATE INDEX v4_MPPhasMPUU_mpterm_idx ON v4_MPUU_ISA_MP(mpterm(100));
 
 
 
-
 -- CREATE table for v4_AMT_products
 -- This table lists the seven AMT products with the IDs, preferred terms AND ARTGID
 DROP TABLE IF EXISTS v4_AMT_products;
 CREATE TABLE v4_AMT_products AS
 
-SELECT
-    CTPP_TPP.sourceId as ctppid,
-    get_PT(CTPP_TPP.sourceId) as ctppterm,
-    
+SELECT 
+	 ctpp_tpp.sourceid CTPP_ID, 
+	 get_PT(ctpp_tpp.sourceid) COLLATE utf8_unicode_ci CTPP_PT, 
     IF(artgid.schemeValue is null, '', artgid.schemeValue) ARTG_ID,
+ 
+    ctpp_tpp.destinationid TPP_ID, 
+    get_PT(ctpp_tpp.destinationid) COLLATE utf8_unicode_ci TPP_PT,
     
-    CTPP_TPP.destinationId as tppid,
-    get_PT(CTPP_TPP.destinationId) as tppterm,
+	 tpp_tpuu.tpuuid TPUU_ID,
+    get_PT(tpp_tpuu.tpuuid) COLLATE utf8_unicode_ci TPUU_PT,
     
-    tpp_tpuu.destinationId as tpuuid,
-    get_PT(tpp_tpuu.destinationId) as tpuuterm,
+	 tpp_tp.destinationid TPP_TP_ID,
+    get_PT(tpp_tp.destinationid) COLLATE utf8_unicode_ci TPP_TP_PT,
     
-    CTPP_ProductName.destinationId as CTPP_ProductName_id,
-    get_PT(CTPP_ProductName.destinationId) as CTPP_ProductName_term,
+	 tpuu_tp.destinationid TPUU_TP_ID,
+    get_PT(tpuu_tp.destinationid) COLLATE utf8_unicode_ci TPUU_TP_PT,
     
-    TPUU_ProductName.destinationId as TPUU_ProductName_id,
-    get_PT(TPUU_ProductName.destinationId) as TPUU_ProductName_term,
+	 tpp_mpp.destinationid MPP_ID, 
+    get_PT(tpp_mpp.destinationid) COLLATE utf8_unicode_ci MPP_PT,
     
-    mpp_tpp.mppid as mppid,
-    mpp_tpp.mppterm as mppterm,
+	 tpuu_mpuu.destinationid MPUU_ID,
+    get_PT(tpuu_mpuu.destinationid) COLLATE utf8_unicode_ci MPUU_PT,
     
-    tpuu_mpuu.destinationId as mpuuid,
-    get_PT(tpuu_mpuu.destinationId) as mpuuterm,
-      
-    mpuu_mp.mpid as mp_id,
-    mpuu_mp.mpterm AS mp_term
-    
-FROM relationships_snapshot CTPP_TPP
-LEFT JOIN irefset_snapshot artgid
-	ON CTPP_TPP.sourceid = artgid.referencedComponentId
-	
-LEFT JOIN v4_mpp_to_tpp mpp_tpp
-   ON CTPP_TPP.destinationid = mpp_tpp.tppid
-   
-LEFT JOIN relationships_snapshot tpp_tpuu
-   ON mpp_tpp.tppid = tpp_tpuu.sourceid
-   
-LEFT JOIN relationships_snapshot CTPP_ProductName
-   ON CTPP_TPP.sourceid = CTPP_ProductName.sourceid
+	 mpuu_mp.mpid MP_ID,
+    get_PT(mpuu_mp.mpid)COLLATE utf8_unicode_ci MP_PT
 
-LEFT JOIN relationships_snapshot tpuu_mpuu
-   ON tpuu_mpuu.sourceid = tpp_tpuu.destinationid
+FROM transitive_closure ctpp_tpp
 
-LEFT JOIN relationships_snapshot TPUU_ProductName
-   ON tpp_tpuu.destinationid = TPUU_ProductName.sourceid   
 
-LEFT JOIN v4_MPUU_ISA_MP mpuu_mp
-	ON tpuu_mpuu.destinationid = mpuu_mp.mpuuid
-   
-WHERE 
--- CTPP IS A TPP filters
-CTPP_TPP.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360051000036108) -- CTPP refset
-AND CTPP_TPP.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360041000036105) -- TPP refset
-AND CTPP_TPP.typeId = 116680003 -- Is a
-AND CTPP_TPP.active = 1
+JOIN transitive_closure tpp_mpp 
+ON tpp_mpp.sourceid = ctpp_tpp.destinationid
 
--- TPP contains TPUU filters
-AND tpp_tpuu.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360041000036105) -- TPP refset
-AND tpp_tpuu.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100) -- TPUU refset
-AND tpp_tpuu.typeid IN (774160008,999000081000168101) -- Contains clinical drug, Contains device
-AND tpp_tpuu.active = 1
+JOIN v4_TPPcontainsTPUU tpp_tpuu
+ON ctpp_tpp.destinationid = tpp_tpuu.tppid
 
--- CTPP_ProductName filters
-AND CTPP_ProductName.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360051000036108) -- CTPP refset
-AND CTPP_ProductName.typeid = 774158006 -- Has product name
-AND CTPP_ProductName.active = 1
+JOIN relationships_snapshot tpp_tp
+ON ctpp_tpp.destinationId = tpp_tp.sourceid 
+AND tpp_tp.typeid = 774158006 -- Has product name
+AND tpp_tp.active = 1
 
--- TPUU IS A MPP filters
-AND tpuu_mpuu.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100) -- TPUU refset
-AND tpuu_mpuu.destinationId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360071000036103) -- MPUU refset
-AND tpuu_mpuu.typeid = 116680003 -- Is a
-AND tpuu_mpuu.active = 1
+JOIN transitive_closure tpuu_mpuu
+ON tpuu_mpuu.sourceid = tpp_tpuu.tpuuid
 
--- TPUU_ProductName filters
-AND TPUU_ProductName.sourceId in (SELECT referencedComponentId FROM refset_snapshot WHERE refsetId = 929360031000036100) -- TPUU refset
-AND TPUU_ProductName.typeid = 774158006 -- Has product name
-AND TPUU_ProductName.active = 1;
+JOIN relationships_snapshot tpuu_tp
+ON tpuu_tp.sourceid = tpp_tpuu.tpuuid
+AND tpuu_tp.typeid = 774158006 -- Has product name
+AND tpuu_tp.active = 1
 
-CREATE INDEX v4_AMT_products_ctppid_idx ON v4_AMT_products(ctppid);
-CREATE INDEX v4_AMT_products_ctppterm_idx ON v4_AMT_products(ctppterm(100));
+JOIN v4_mpuu_isa_mp mpuu_mp
+ON mpuu_mp.mpuuid = tpuu_mpuu.destinationid
+
+LEFT OUTER JOIN irefset_snapshot artgid
+ON ctpp_tpp.sourceid = artgid.referencedComponentId
+AND artgid.refsetid = 11000168105 -- ARTG Id reference set
+AND artgid.active = 1
+
+WHERE EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360041000036105 AND ctpp_tpp.destinationid = referencedComponentId) -- TPP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a 
+                JOIN refset_snapshot ON refsetid = 929360041000036105 AND sourceid = referencedComponentId
+                JOIN transitive_closure b on a.sourceid = b.destinationid 
+                WHERE ctpp_tpp.destinationid = a.destinationid AND ctpp_tpp.sourceid = b.sourceid)
+
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360081000036101 AND tpp_mpp.destinationid = referencedComponentId) -- MPP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360081000036101 AND sourceid = referencedComponentId 
+                JOIN transitive_closure b ON a.sourceid = b.destinationid 
+                WHERE tpp_mpp.destinationid = a.destinationid and tpp_mpp.sourceid = b.sourceid)
+                
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360071000036103 AND tpuu_mpuu.destinationid = referencedComponentId) -- MPUU refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360071000036103 AND sourceid = referencedComponentId 
+                JOIN transitive_closure b on a.sourceid = b.destinationid 
+                WHERE tpuu_mpuu.destinationid = a.destinationid AND tpuu_mpuu.sourceid = b.sourceid)                
+               
+AND EXISTS (SELECT 'a' FROM refset_snapshot WHERE refsetid = 929360061000036106 and mpuu_mp.mpid = referencedComponentId) -- MP refset
+AND NOT EXISTS (SELECT 'a' FROM transitive_closure a
+                JOIN refset_snapshot ON refsetid = 929360061000036106 and sourceid = referencedComponentId 
+                JOIN transitive_closure b ON a.sourceid = b.destinationid 
+                WHERE mpuu_mp.mpid = a.destinationid AND mpuu_mp.mpuuid = b.sourceid)
+ORDER BY CTPP_PT,TPUU_PT;
+
+-- Create Indexes for v4_AMT_products table
+CREATE INDEX v4_AMT_products_CTPP_ID_idx ON v4_AMT_products(CTPP_ID);
+CREATE INDEX v4_AMT_products_CTPP_PT_idx ON v4_AMT_products(CTPP_PT(100));
 CREATE INDEX v4_AMT_products_ARTG_ID_idx ON v4_AMT_products(ARTG_ID);
-CREATE INDEX v4_AMT_products_tppid_idx ON v4_AMT_products(tppid);
-CREATE INDEX v4_AMT_products_tppterm_idx ON v4_AMT_products(tppterm(100));
-CREATE INDEX v4_AMT_products_tpuuid_idx ON v4_AMT_products(tpuuid);
-CREATE INDEX v4_AMT_products_tpuuterm_idx ON v4_AMT_products(tpuuterm(100));
-CREATE INDEX v4_AMT_products_CTPP_ProductName_id_idx ON v4_AMT_products(CTPP_ProductName_id);
-CREATE INDEX v4_AMT_products_CTPP_ProductName_term_idx ON v4_AMT_products(CTPP_ProductName_term(100));
-CREATE INDEX v4_AMT_products_TPUU_ProductName_id_idx ON v4_AMT_products(TPUU_ProductName_id);
-CREATE INDEX v4_AMT_products_TPUU_ProductName_term_idx ON v4_AMT_products(TPUU_ProductName_term(100));
-CREATE INDEX v4_AMT_products_mppid_idx ON v4_AMT_products(mppid);
-CREATE INDEX v4_AMT_products_mppterm_idx ON v4_AMT_products(mppterm(100));
-CREATE INDEX v4_AMT_products_mpuuid_idx ON v4_AMT_products(mpuuid);
-CREATE INDEX v4_AMT_products_mpuuterm_idx ON v4_AMT_products(mpuuterm(100));
-CREATE INDEX v4_AMT_products_mp_id_idx ON v4_AMT_products(mp_id);
-CREATE INDEX v4_AMT_products_mp_term_idx ON v4_AMT_products(mp_term(100));
-
+CREATE INDEX v4_AMT_products_TPP_ID_idx ON v4_AMT_products(TPP_ID);
+CREATE INDEX v4_AMT_products_TPP_PT_idx ON v4_AMT_products(TPP_PT(100));
+CREATE INDEX v4_AMT_products_TPUU_ID_idx ON v4_AMT_products(TPUU_ID);
+CREATE INDEX v4_AMT_products_TPUU_PT_idx ON v4_AMT_products(TPUU_PT(100));
+CREATE INDEX v4_AMT_products_TPP_TP_ID_idx ON v4_AMT_products(TPP_TP_ID);
+CREATE INDEX v4_AMT_products_TPP_TP_PT_idx ON v4_AMT_products(TPP_TP_PT(100));
+CREATE INDEX v4_AMT_products_TPUU_TP_ID_idx ON v4_AMT_products(TPUU_TP_ID);
+CREATE INDEX v4_AMT_products_TPUU_TP_PT_idx ON v4_AMT_products(TPUU_TP_PT(100));
+CREATE INDEX v4_AMT_products_MPP_ID_idx ON v4_AMT_products(MPP_ID);
+CREATE INDEX v4_AMT_products_MPP_PT_idx ON v4_AMT_products(MPP_PT(100));
+CREATE INDEX v4_AMT_products_MPUU_ID_idx ON v4_AMT_products(MPUU_ID);
+CREATE INDEX v4_AMT_products_MPUU_PT_idx ON v4_AMT_products(MPUU_PT(100));
+CREATE INDEX v4_AMT_products_MP_ID_idx ON v4_AMT_products(MP_ID);
+CREATE INDEX v4_AMT_products_MP_PT_idx ON v4_AMT_products(MP_PT(100));
