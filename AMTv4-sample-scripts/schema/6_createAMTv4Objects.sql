@@ -147,10 +147,6 @@ FROM v4_MPPhasMPUU MPPhasMPUU
 		  AND ConcentrationUnit.typeid = 999000031000168102 -- Has concentration strength unit (attribute)        
         AND ConcentrationUnit.active = 1;
 
--- Clean up the numeric columns by removing the # character
-UPDATE v4_ingredient_strength SET ConcentrationValue = REPLACE(ConcentrationValue, '#', '');
-UPDATE v4_ingredient_strength SET TotalQuantity = REPLACE(TotalQuantity, '#', '');
-
 
 -- Create Indexes for v4_ingredient_strength table
 CREATE INDEX v4_ingredient_strength ON v4_ingredient_strength(mppid);

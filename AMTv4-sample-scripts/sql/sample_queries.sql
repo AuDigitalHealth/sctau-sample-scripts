@@ -22,14 +22,18 @@ FROM
 	refset_snapshot AS rs,
 	descriptions_snapshot AS d,
 	language_refset_snapshot AS adrs
+	
 WHERE c.id=rs.referencedComponentId
 AND c.id=d.conceptid
 AND d.id=adrs.referencedComponentId
-AND adrs.acceptabilityid=900000000000548007 -- ID of Preferred Term
 AND rs.refsetid= 11000036103 -- ID of Adverse reaction type refset
+AND d.typeid = 900000000000013009 -- Synonym
+AND adrs.refsetid = 32570271000036106 -- ADRS
+AND adrs.acceptabilityid=900000000000548007 -- ID of Preferred Term
 AND c.active=1
 AND d.active=1
 AND rs.active=1
+AND ADRS.active = 1
 ORDER BY preferred_term;
 
 -- 4. List of Australian reference sets & member count 
@@ -42,7 +46,8 @@ FROM
 	(SELECT 
 	term,id,conceptid 
 	FROM descriptions_snapshot AS ds
-	WHERE active=1) AS desc_active,
+	WHERE active=1 AND typeid = 900000000000013009 -- Synonym
+	) AS desc_active,
 	
     	(SELECT 
 	referencedComponentId 
@@ -75,9 +80,9 @@ JOIN (SELECT sourceId
 		) AS ffd
 		ON c.id=ffd.sourceid
 JOIN descriptions_snapshot AS d
-	   ON c.id=d.conceptid
+	   ON c.id=d.conceptid AND d.typeid = 900000000000013009 -- Synonym
 JOIN language_refset_snapshot AS adrs
-		ON d.id=adrs.referencedComponentId
+		ON d.id=adrs.referencedComponentId AND adrs.refsetId = 32570271000036106  -- Australian dialect refset
 WHERE adrs.acceptabilityid = 900000000000548007 -- ID of Preferred Term
 AND c.active=1
 AND d.active=1
@@ -106,6 +111,8 @@ language_refset_snapshot AS adrs
 WHERE c.id=ffd.sourceid
 AND c.id=d.conceptid
 AND d.id=adrs.referencedComponentId
+AND d.typeid = 900000000000013009 -- Synonym
+AND adrs.refsetId = 32570271000036106  -- Australian dialect refset
 AND adrs.acceptabilityid=900000000000548007 -- ID of Preferred Term
 AND c.active=1
 AND d.active=1
@@ -130,6 +137,8 @@ WHERE
 c.id=pd.sourceid
 AND c.id=d.conceptid
 AND d.id=adrs.referencedComponentId
+AND d.typeid = 900000000000013009 -- Synonym
+AND adrs.refsetId = 32570271000036106  -- Australian dialect refset
 AND adrs.acceptabilityid=900000000000548007 -- ID of Preferred Term
 AND c.active=1
 AND d.active=1
